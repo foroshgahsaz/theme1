@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BORK — Продуманное превосходство</title>
+  <meta name="description" content="Официальный сайт BORK. Продуманное превосходство." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          },
+          colors: {
+            bork: {
+              black: '#111111',
+              charcoal: '#1c1c1c',
+              gray: '#8a8a8a',
+              light: '#f5f5f3',
+              accent: '#c45c26',
+            },
+          },
+          letterSpacing: {
+            bork: '0.35em',
+            wide: '0.2em',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html, body { height: 100%; }
+    body { -webkit-font-smoothing: antialiased; }
+
+    .hero-swiper .swiper-slide {
+      height: 100%;
+    }
+
+    .hero-swiper .swiper-slide-active .slide-caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .slide-caption {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.9s ease 0.25s, transform 0.9s ease 0.25s;
+    }
+
+    .hero-pagination .swiper-pagination-bullet {
+      width: 48px;
+      height: 2px;
+      border-radius: 0;
+      background: rgba(255, 255, 255, 0.35);
+      opacity: 1;
+      margin: 0 4px !important;
+      transition: background 0.35s ease, transform 0.35s ease;
+    }
+
+    .hero-pagination .swiper-pagination-bullet-active {
+      background: #fff;
+      transform: scaleY(1.5);
+    }
+
+    .menu-overlay {
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path 0.55s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .menu-overlay.is-open {
+      clip-path: inset(0 0 0 0);
+    }
+
+    .icon-btn {
+      transition: opacity 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      opacity: 0.65;
+    }
+  </style>
+</head>
+<body class="bg-bork-black text-white font-sans antialiased overflow-x-hidden">
+
+  <!-- Header -->
+  <header class="fixed inset-x-0 top-0 z-50">
+    <div class="mx-auto flex h-[72px] max-w-[1600px] items-center justify-between px-5 md:px-10 lg:px-14">
+      <!-- Left: menu -->
+      <div class="flex w-[120px] items-center md:w-[180px]">
+        <button
+          id="menuBtn"
+          type="button"
+          class="icon-btn flex items-center gap-3 text-[11px] uppercase tracking-wide"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+        >
+          <span class="flex flex-col gap-[5px]" aria-hidden="true">
+            <span class="block h-px w-5 bg-white"></span>
+            <span class="block h-px w-5 bg-white"></span>
+          </span>
+          <span class="hidden sm:inline">Меню</span>
+        </button>
+      </div>
+
+      <!-- Center: logo -->
+      <a href="#" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[18px] font-medium tracking-bork md:text-[20px]">
+        BORK
+      </a>
+
+      <!-- Right: actions -->
+      <div class="flex w-[120px] items-center justify-end gap-4 md:w-[180px] md:gap-5">
+        <button type="button" class="icon-btn hidden text-[11px] uppercase tracking-wide sm:inline" aria-label="Язык">
+          <span class="text-white">Рус</span>
+          <span class="mx-1 text-white/40">/</span>
+          <span class="text-white/50">Eng</span>
+        </button>
+        <button type="button" class="icon-btn" aria-label="Поиск">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+        </button>
+        <button type="button" class="icon-btn hidden md:block" aria-label="Личный кабинет">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M5 20c1.5-3 4-5 7-5s5.5 2 7 5"></path>
+          </svg>
+        </button>
+        <button type="button" class="icon-btn" aria-label="Корзина">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path d="M6 7h15l-1.5 9h-12z"></path>
+            <path d="M6 7l-1-3H3"></path>
+            <circle cx="9" cy="19" r="1.2"></circle>
+            <circle cx="17" cy="19" r="1.2"></circle>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Fullscreen menu -->
+  <div
+    id="menuOverlay"
+    class="menu-overlay fixed inset-0 z-[60] bg-bork-light text-bork-black"
+    aria-hidden="true"
+  >
+    <div class="flex h-full flex-col">
+      <div class="flex items-center justify-between px-5 py-6 md:px-14">
+        <button id="menuClose" type="button" class="text-[11px] uppercase tracking-wide" aria-label="Закрыть меню">
+          Закрыть
+        </button>
+        <span class="text-[18px] font-medium tracking-bork">BORK</span>
+        <div class="text-[11px] uppercase tracking-wide">
+          <span>Рус</span>
+          <span class="mx-1 text-black/30">/</span>
+          <span class="text-black/40">Eng</span>
+        </div>
+      </div>
+
+      <nav class="flex flex-1 flex-col justify-center px-8 md:px-20">
+        <ul class="space-y-4 md:space-y-5">
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Новинки</a></li>
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Идеи подарков</a></li>
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Кухня</a></li>
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Дом</a></li>
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Красота и здоровье</a></li>
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Outdoor</a></li>
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">BORK Home</a></li>
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Voyage</a></li>
+          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Interior</a></li>
+        </ul>
+      </nav>
+
+      <div class="border-t border-black/10 px-8 py-8 md:px-20">
+        <a href="tel:88005008899" class="text-sm tracking-wide text-bork-gray hover:text-bork-black">8 800 500 88 99</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero slider -->
+  <main class="relative h-screen min-h-[640px] w-full">
+    <div class="swiper hero-swiper h-full w-full">
+      <div class="swiper-wrapper">
+
+        <!-- Slide 1 -->
+        <div class="swiper-slide">
+          <a href="#" class="group relative block h-full w-full overflow-hidden">
+            <picture>
+              <source media="(max-width: 767px)" srcset="https://st.bork.ru/home-page/a808-mob-new.jpg" />
+              <img
+                src="https://st.bork.ru/home-page/a808-desk-new.jpg"
+                alt="Сезон чистого воздуха"
+                class="absolute inset-0 h-full w-full object-cover object-center transition duration-[1.2s] group-hover:scale-[1.02]"
+              />
+            </picture>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
+            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
+              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
+                Сезон чистого воздуха
+              </h2>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="swiper-slide">
+          <a href="#" class="group relative block h-full w-full overflow-hidden">
+            <picture>
+              <source media="(max-width: 767px)" srcset="https://st.bork.ru/home-page/v888-new-mob.jpg" />
+              <img
+                src="https://st.bork.ru/home-page/v888-new-desk.jpg"
+                alt="Моющие пылесосы Neuron"
+                class="absolute inset-0 h-full w-full object-cover object-center transition duration-[1.2s] group-hover:scale-[1.02]"
+              />
+            </picture>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
+            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
+              <h2 class="max-w-[16ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
+                Моющие пылесосы Neuron
+              </h2>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="swiper-slide">
+          <a href="#" class="group relative block h-full w-full overflow-hidden">
+            <img
+              src="https://st.bork.ru/home-page/610-desk-b.jpg"
+              alt="Приготовьтесь к BBQ-сезону"
+              class="absolute inset-0 h-full w-full object-cover object-center transition duration-[1.2s] group-hover:scale-[1.02]"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
+            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
+              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
+                Приготовьтесь к BBQ-сезону
+              </h2>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="swiper-slide">
+          <a href="#" class="group relative block h-full w-full overflow-hidden">
+            <div class="absolute inset-0 bg-[#171717]"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(196,92,38,0.22),transparent_55%)]"></div>
+            <div class="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.04),transparent_45%)]"></div>
+            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
+              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
+                Порадуйте себя новинками
+              </h2>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="swiper-slide">
+          <a href="#" class="group relative block h-full w-full overflow-hidden">
+            <picture>
+              <source media="(max-width: 767px)" srcset="https://st.bork.ru/home-page/bork-home-mobile.jpg" />
+              <img
+                src="https://st.bork.ru/home-page/bork-home-mobile.jpg"
+                alt="Коллекция BORK HOME"
+                class="absolute inset-0 h-full w-full object-cover object-center transition duration-[1.2s] group-hover:scale-[1.02]"
+              />
+            </picture>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
+            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
+              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
+                Коллекция BORK HOME
+              </h2>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="swiper-slide">
+          <a href="#" class="group relative block h-full w-full overflow-hidden">
+            <div class="absolute inset-0 bg-[#121212]"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_60%,rgba(255,255,255,0.08),transparent_50%)]"></div>
+            <div class="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.45))]"></div>
+            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
+              <h2 class="max-w-[12ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
+                Персонализация
+              </h2>
+            </div>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Pagination -->
+      <div class="hero-pagination swiper-pagination !bottom-[88px] !left-1/2 !w-auto !-translate-x-1/2"></div>
+    </div>
+
+    <!-- Phone -->
+    <div class="pointer-events-none absolute inset-x-0 bottom-8 z-40 text-center">
+      <a
+        href="tel:88005008899"
+        class="pointer-events-auto text-[13px] font-light tracking-[0.18em] text-white/90 transition hover:text-white md:text-sm"
+      >
+        8 800 500 88 99
+      </a>
+    </div>
+
+    <!-- Slider arrows -->
+    <button
+      type="button"
+      class="hero-prev icon-btn absolute left-3 top-1/2 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/10 backdrop-blur-sm md:left-8 md:flex"
+      aria-label="Предыдущий слайд"
+    >
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M15 6l-6 6 6 6"></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="hero-next icon-btn absolute right-3 top-1/2 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/10 backdrop-blur-sm md:right-8 md:flex"
+      aria-label="Следующий слайд"
+    >
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M9 6l6 6-6 6"></path>
+      </svg>
+    </button>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const menuClose = document.getElementById('menuClose');
+    const menuOverlay = document.getElementById('menuOverlay');
+
+    const openMenu = () => {
+      menuOverlay.classList.add('is-open');
+      menuOverlay.setAttribute('aria-hidden', 'false');
+      menuBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeMenu = () => {
+      menuOverlay.classList.remove('is-open');
+      menuOverlay.setAttribute('aria-hidden', 'true');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    };
+
+    menuBtn.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    const heroSwiper = new Swiper('.hero-swiper', {
+      loop: true,
+      speed: 1100,
+      effect: 'fade',
+      fadeEffect: { crossFade: true },
+      autoplay: {
+        delay: 5500,
+        disableOnInteraction: false,
+      },
+      pagination: {
+        el: '.hero-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '.hero-next',
+        prevEl: '.hero-prev',
+      },
+    });
+  </script>
+</body>
+</html>
