@@ -22,10 +22,13 @@
               black: '#111111',
               charcoal: '#1c1c1c',
               brown: '#3a3330',
+              header: '#2e2826',
+              muted: '#9d9390',
               gray: '#8a8a8a',
               light: '#f5f5f3',
-              line: '#e8e8e6',
+              line: 'rgba(255,255,255,0.1)',
               accent: '#ef6f2e',
+              card: '#312a28',
             },
           },
           letterSpacing: {
@@ -40,15 +43,135 @@
     };
   </script>
   <style>
-    body { -webkit-font-smoothing: antialiased; }
-    .hero-swiper .swiper-slide { height: 100%; }
-    .hero-swiper .swiper-slide-active .slide-caption { opacity: 1; transform: translateY(0); }
-    .slide-caption { opacity: 0; transform: translateY(18px); transition: opacity .9s ease .25s, transform .9s ease .25s; }
-    .hero-pagination .swiper-pagination-bullet {
-      width: 48px; height: 2px; border-radius: 0; background: rgba(255,255,255,.35);
-      opacity: 1; margin: 0 4px !important; transition: background .35s ease, transform .35s ease;
+    :root {
+      --bottom-gap: 60px;
+      --body-bg: #3a3330;
+      --header-bg: rgba(46, 40, 38, 0.8);
     }
-    .hero-pagination .swiper-pagination-bullet-active { background: #fff; transform: scaleY(1.5); }
+    body { -webkit-font-smoothing: antialiased; background: var(--body-bg); color: #fff; }
+    body.slider-locked { overflow: hidden; height: 100vh; height: 100dvh; }
+
+    .hero-scroll-wrap {
+      position: relative;
+      height: 100vh;
+      height: 100dvh;
+      background: var(--body-bg);
+    }
+    .hero-scroller {
+      height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scroll-snap-type: y mandatory;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .hero-scroller::-webkit-scrollbar { display: none; }
+    .hero-slide {
+      position: relative;
+      display: flex;
+      flex-shrink: 0;
+      flex-direction: column;
+      width: 100%;
+      height: calc(100dvh - var(--bottom-gap));
+      min-height: calc(100vh - var(--bottom-gap));
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      background: var(--body-bg);
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .hero-slide__inner {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+    .hero-slide__media { position: absolute; inset: 0; overflow: hidden; }
+    .hero-slide__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transform: scale(1.02);
+      transition: transform 1.2s ease;
+    }
+    .hero-slide:hover .hero-slide__media img { transform: scale(1.05); }
+    .hero-slide__shade::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+      height: 167px;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+    }
+    .hero-slide__caption {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 960px;
+      margin: auto auto 0;
+      padding: 0 32px 64px;
+      color: #fff;
+      text-align: center;
+    }
+    .hero-slide__title {
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 35px;
+      letter-spacing: 1px;
+      transform: translateY(30px);
+      opacity: 0;
+      transition: transform 800ms ease 300ms, opacity 800ms ease 300ms;
+    }
+    .hero-slide.is-visible .hero-slide__title {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    @media (max-width: 767px) {
+      .hero-slide__caption { max-width: 480px; padding: 0 16px 64px; }
+      .hero-slide__title { font-size: 18px; line-height: 23px; transition-delay: 0ms; }
+    }
+    .hero-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: var(--bottom-gap);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 200;
+      letter-spacing: 0.12em;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: opacity 200ms ease;
+    }
+    .hero-bottom-bar:hover { opacity: 0.75; }
+    .hero-bottom-bar.is-last { cursor: default; }
+    .hero-scroll-wrap.is-complete { height: auto; min-height: 100dvh; }
+    .hero-scroll-wrap.is-complete .hero-scroller { overflow: visible; scroll-snap-type: none; }
+    .hero-scroll-wrap.is-complete .hero-bottom-bar { display: none; }
+    #pageMain.is-active { opacity: 1; transform: translateY(0); }
+
+    #siteHeader {
+      background: transparent;
+      transition: background 300ms ease;
+    }
+    #siteHeader.has-header-bg {
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+    }
+
     .panel-overlay {
       clip-path: inset(0 100% 0 0);
       transition: clip-path .55s cubic-bezier(.77,0,.175,1);
@@ -61,11 +184,6 @@
     .product-card:hover img { transform: scale(1.04); }
     .category-tile img { transition: transform .6s ease; }
     .category-tile:hover img { transform: scale(1.05); }
-    #siteHeader.is-scrolled { background: rgba(245,245,243,.96); color: #111; backdrop-filter: blur(12px); border-bottom: 1px solid #e8e8e6; }
-    #siteHeader.is-scrolled .header-dark { color: #111; }
-    #siteHeader.is-scrolled .header-muted { color: rgba(17,17,17,.45); }
-    #siteHeader.is-scrolled .header-line { background: #111; }
-    #siteHeader.is-scrolled .header-icon { color: #111; }
     .article-card img { transition: transform .55s ease; }
     .article-card:hover img { transform: scale(1.04); }
     .cookie-bar { transform: translateY(100%); transition: transform .45s ease; }
@@ -74,7 +192,7 @@
     .drawer.is-open { transform: translateX(0); }
   </style>
 </head>
-<body class="bg-bork-light text-bork-black font-sans antialiased overflow-x-hidden">
+<body class="slider-locked font-sans antialiased overflow-x-hidden text-white">
 
   <!-- Header -->
   <header id="siteHeader" class="fixed inset-x-0 top-0 z-50 text-white transition-colors duration-300">
@@ -143,7 +261,7 @@
               <div class="flex h-24 w-24 items-center justify-center rounded bg-white p-2 shadow-sm">
                 <svg viewBox="0 0 100 100" class="h-full w-full text-bork-black"><rect x="8" y="8" width="24" height="24"></rect><rect x="40" y="8" width="24" height="24"></rect><rect x="72" y="8" width="20" height="24"></rect><rect x="8" y="40" width="24" height="24"></rect><rect x="40" y="40" width="24" height="24"></rect><rect x="72" y="40" width="20" height="24"></rect><rect x="8" y="72" width="24" height="20"></rect><rect x="40" y="72" width="24" height="20"></rect><rect x="72" y="72" width="20" height="20"></rect></svg>
               </div>
-              <div class="space-y-2 text-sm text-bork-gray">
+              <div class="space-y-2 text-sm text-bork-muted">
                 <p>Отсканируйте камерой, чтобы скачать</p>
                 <div class="flex gap-2">
                   <span class="rounded border border-black/10 px-3 py-1.5 text-xs">App Store</span>
@@ -206,7 +324,7 @@
       </div>
       <div class="flex flex-1 flex-col justify-center px-5 md:px-14">
         <h2 class="mb-2 text-3xl font-light md:text-4xl">Личный кабинет</h2>
-        <p class="mb-8 max-w-md text-sm text-bork-gray">Введите номер телефона для входа или регистрации</p>
+        <p class="mb-8 max-w-md text-sm text-bork-muted">Введите номер телефона для входа или регистрации</p>
         <form class="max-w-md space-y-4" onsubmit="return false;">
           <label class="block">
             <span class="mb-2 block text-[11px] uppercase tracking-wide text-bork-gray">Телефон</span>
@@ -236,85 +354,80 @@
   </div>
   <div id="cartBackdrop" class="fixed inset-0 z-[65] hidden bg-black/40"></div>
 
-  <!-- Hero -->
-  <section class="relative h-screen min-h-[640px] w-full bg-bork-black text-white">
-    <div class="swiper hero-swiper h-full w-full">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
+  <!-- Hero scroll slider (BORK-style) -->
+  <section id="heroScrollWrap" class="hero-scroll-wrap">
+    <div id="heroScroller" class="hero-scroller" aria-label="Главный слайдер">
+
+      <a href="#" class="hero-slide" data-slide="0">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
             <picture>
               <source media="(max-width: 767px)" srcset="https://st.bork.ru/home-page/a808-mob-new.jpg" />
-              <img src="https://st.bork.ru/home-page/a808-desk-new.jpg" alt="Сезон чистого воздуха" class="absolute inset-0 h-full w-full object-cover transition duration-[1.2s] group-hover:scale-[1.02]" />
+              <img src="https://st.bork.ru/home-page/a808-desk-new.jpg" alt="Сезон чистого воздуха" loading="eager" />
             </picture>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">Сезон чистого воздуха</h2>
-            </div>
-          </a>
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Сезон чистого воздуха</h2></div>
         </div>
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
+      </a>
+
+      <a href="#" class="hero-slide" data-slide="1">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
             <picture>
               <source media="(max-width: 767px)" srcset="https://st.bork.ru/home-page/v888-new-mob.jpg" />
-              <img src="https://st.bork.ru/home-page/v888-new-desk.jpg" alt="Моющие пылесосы Neuron" class="absolute inset-0 h-full w-full object-cover transition duration-[1.2s] group-hover:scale-[1.02]" />
+              <img src="https://st.bork.ru/home-page/v888-new-desk.jpg" alt="Моющие пылесосы Neuron" loading="lazy" />
             </picture>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[16ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">Моющие пылесосы Neuron</h2>
-            </div>
-          </a>
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Моющие пылесосы Neuron</h2></div>
         </div>
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
-            <img src="https://st.bork.ru/home-page/610-desk-b.jpg" alt="Приготовьтесь к BBQ-сезону" class="absolute inset-0 h-full w-full object-cover transition duration-[1.2s] group-hover:scale-[1.02]" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">Приготовьтесь к BBQ-сезону</h2>
-            </div>
-          </a>
+      </a>
+
+      <a href="#" class="hero-slide" data-slide="2">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
+            <img src="https://st.bork.ru/home-page/610-desk-b.jpg" alt="Приготовьтесь к BBQ-сезону" loading="lazy" />
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Приготовьтесь к BBQ-сезону</h2></div>
         </div>
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
+      </a>
+
+      <a href="#" class="hero-slide" data-slide="3">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
             <div class="absolute inset-0 bg-[#171717]"></div>
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(196,92,38,0.22),transparent_55%)]"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">Порадуйте себя новинками</h2>
-            </div>
-          </a>
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Порадуйте себя новинками</h2></div>
         </div>
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
-            <img src="https://st.bork.ru/home-page/bork-home-mobile.jpg" alt="Коллекция BORK HOME" class="absolute inset-0 h-full w-full object-cover transition duration-[1.2s] group-hover:scale-[1.02]" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">Коллекция BORK HOME</h2>
-            </div>
-          </a>
+      </a>
+
+      <a href="#" class="hero-slide" data-slide="4">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
+            <img src="https://st.bork.ru/home-page/bork-home-mobile.jpg" alt="Коллекция BORK HOME" loading="lazy" />
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Коллекция BORK HOME</h2></div>
         </div>
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
+      </a>
+
+      <a href="#" class="hero-slide" data-slide="5">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
             <div class="absolute inset-0 bg-[#121212]"></div>
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_60%,rgba(255,255,255,0.08),transparent_50%)]"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[12ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">Персонализация</h2>
-            </div>
-          </a>
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Персонализация</h2></div>
         </div>
-      </div>
-      <div class="hero-pagination swiper-pagination !bottom-[88px] !left-1/2 !w-auto !-translate-x-1/2"></div>
+      </a>
+
     </div>
-    <div class="pointer-events-none absolute inset-x-0 bottom-8 z-40 text-center">
-      <a href="tel:88005008899" class="pointer-events-auto text-[13px] font-light tracking-[0.18em] text-white/90 transition hover:text-white md:text-sm">8 800 500 88 99</a>
-    </div>
-    <button type="button" class="hero-prev icon-btn absolute left-3 top-1/2 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/10 backdrop-blur-sm md:left-8 md:flex" aria-label="Предыдущий слайд">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg>
-    </button>
-    <button type="button" class="hero-next icon-btn absolute right-3 top-1/2 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/10 backdrop-blur-sm md:right-8 md:flex" aria-label="Следующий слайд">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg>
+
+    <button id="heroBottomBar" type="button" class="hero-bottom-bar" aria-label="Следующий слайд">
+      <span id="heroPhoneText">8 800 500 88 99</span>
     </button>
   </section>
 
-  <main class="bg-bork-light">
+  <main id="pageMain" class="bg-bork-brown text-white opacity-0 translate-y-[100px] transition-all duration-500">
 
     <!-- Collection 1 -->
     <section class="mx-auto max-w-site px-5 pb-16 pt-20 md:px-10 lg:px-14">
@@ -328,45 +441,45 @@
           <div class="swiper-wrapper">
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <span class="absolute left-3 top-3 rounded bg-bork-black px-2 py-1 text-[10px] uppercase tracking-wide text-white">Новинка</span>
                   <img src="https://st.bork.ru/pages/f732-or.png" alt="Фен BORK F730 LE" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Фен BORK F730 LE</h3>
-                <p class="text-sm text-bork-gray">89&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">89&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/f732-or.png" alt="Фен-стайлер BORK F704" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Комплексная система лифтинга BORK F704</h3>
-                <p class="text-sm text-bork-gray">129&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">129&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/f732-or.png" alt="Увлажнитель BORK F772" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Портативный увлажнитель BORK F772</h3>
-                <p class="text-sm text-bork-gray">24&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">24&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/f732-or.png" alt="Зеркало BORK F771" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Умное зеркало BORK F771</h3>
-                <p class="text-sm text-bork-gray">59&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">59&nbsp;990&nbsp;₽</p>
               </a>
             </div>
           </div>
         </div>
-        <button type="button" class="collection-prev-fans icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
-        <button type="button" class="collection-next-fans icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
+        <button type="button" class="collection-prev-fans icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="collection-next-fans icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
       </div>
     </section>
 
@@ -382,45 +495,45 @@
           <div class="swiper-wrapper">
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <span class="absolute left-3 top-3 rounded bg-bork-black px-2 py-1 text-[10px] uppercase tracking-wide text-white">Новинка</span>
                   <img src="https://st.bork.ru/pages/v830.png" alt="Моющий пылесос V810 Neuron" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Моющий пылесос BORK V810 Neuron</h3>
-                <p class="text-sm text-bork-gray">129&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">129&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/v830.png" alt="Робот-пылесос V830" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Робот-пылесос BORK V830</h3>
-                <p class="text-sm text-bork-gray">99&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">99&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/a802.png" alt="Очиститель A802 RAIN" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Очиститель-увлажнитель BORK A802 RAIN</h3>
-                <p class="text-sm text-bork-gray">119&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">119&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/a802.png" alt="Очиститель A808" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Очиститель воздуха BORK A808</h3>
-                <p class="text-sm text-bork-gray">89&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">89&nbsp;990&nbsp;₽</p>
               </a>
             </div>
           </div>
         </div>
-        <button type="button" class="collection-prev-vacuum icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
-        <button type="button" class="collection-next-vacuum icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
+        <button type="button" class="collection-prev-vacuum icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="collection-next-vacuum icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
       </div>
     </section>
 
@@ -436,44 +549,44 @@
           <div class="swiper-wrapper">
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/d770.png" alt="Массажёр BORK D715" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Массажёр для ног BORK D715</h3>
-                <p class="text-sm text-bork-gray">79&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">79&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/d770.png" alt="Массажёр BORK D701" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Перкуссионный массажёр BORK D701</h3>
-                <p class="text-sm text-bork-gray">49&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">49&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/d770.png" alt="Массажёр BORK D708" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Массажёр для шеи BORK D708</h3>
-                <p class="text-sm text-bork-gray">34&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">34&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/d770.png" alt="Массажёр BORK D622" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Массажёр для глаз BORK D622</h3>
-                <p class="text-sm text-bork-gray">29&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">29&nbsp;990&nbsp;₽</p>
               </a>
             </div>
           </div>
         </div>
-        <button type="button" class="collection-prev-massage icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
-        <button type="button" class="collection-next-massage icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
+        <button type="button" class="collection-prev-massage icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="collection-next-massage icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
       </div>
     </section>
 
@@ -489,76 +602,76 @@
           <div class="swiper-wrapper">
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/hk804-wt.png" alt="Сервировка BORK" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Набор для сервировки BORK HK804</h3>
-                <p class="text-sm text-bork-gray">44&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">44&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/l793.png" alt="Power bank BORK L795" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Power bank BORK L795</h3>
-                <p class="text-sm text-bork-gray">19&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">19&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/g702.png" alt="Вафельница BORK G702" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Вафельница BORK G702</h3>
-                <p class="text-sm text-bork-gray">24&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">24&nbsp;990&nbsp;₽</p>
               </a>
             </div>
             <div class="swiper-slide w-[220px] md:w-[280px]">
               <a href="#" class="product-card block">
-                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-white md:h-[280px]">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
                   <img src="https://st.bork.ru/pages/w800.png" alt="Микроволновая печь BORK W800" class="max-h-[75%] max-w-[75%] object-contain" />
                 </div>
                 <h3 class="mb-2 text-sm font-light leading-snug">Микроволновая печь BORK W800</h3>
-                <p class="text-sm text-bork-gray">54&nbsp;990&nbsp;₽</p>
+                <p class="text-sm text-bork-muted">54&nbsp;990&nbsp;₽</p>
               </a>
             </div>
           </div>
         </div>
-        <button type="button" class="collection-prev-home icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
-        <button type="button" class="collection-next-home icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
+        <button type="button" class="collection-prev-home icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="collection-next-home icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
       </div>
     </section>
 
     <!-- Brand intro -->
-    <section class="border-y border-bork-line bg-white py-20">
+    <section class="border-y border-bork-line bg-bork-header py-20">
       <div class="mx-auto max-w-3xl px-5 text-center md:px-10">
-        <p class="text-[11px] uppercase tracking-wide text-bork-gray">Продуманное превосходство</p>
-        <h2 class="mt-4 text-3xl font-light leading-snug md:text-5xl">BORK — международная компания, создающая бытовую технику и аксессуары премиум-класса</h2>
-        <p class="mt-6 text-sm leading-relaxed text-bork-gray md:text-base">Коллекция элитной техники для кухни, создания комфортного микроклимата и полный ассортимент аксессуаров для дома. Официальный интернет-бутик BORK премиум-класса с доставкой по России.</p>
+        <p class="text-[11px] uppercase tracking-wide text-bork-muted">Продуманное превосходство</p>
+        <h2 class="mt-4 text-3xl font-light leading-snug text-white md:text-5xl">BORK — международная компания, создающая бытовую технику и аксессуары премиум-класса</h2>
+        <p class="mt-6 text-sm leading-relaxed text-bork-muted md:text-base">Коллекция элитной техники для кухни, создания комфортного микроклимата и полный ассортимент аксессуаров для дома. Официальный интернет-бутик BORK премиум-класса с доставкой по России.</p>
       </div>
     </section>
 
     <!-- Services -->
     <section class="mx-auto max-w-site px-5 py-20 md:px-10 lg:px-14">
       <div class="grid gap-6 md:grid-cols-3">
-        <a href="#" class="group overflow-hidden rounded-sm bg-white p-8 transition hover:shadow-lg">
-          <p class="text-[11px] uppercase tracking-wide text-bork-gray">Бутики</p>
-          <h3 class="mt-3 text-2xl font-light">Посетите монобрендовый бутик BORK</h3>
-          <p class="mt-4 text-sm text-bork-gray">Более 75 бутиков в 29 городах России и СНГ. Полный ассортимент и персональная консультация.</p>
-          <span class="mt-8 inline-block text-sm underline-offset-4 group-hover:underline">Найти бутик</span>
+        <a href="#" class="group overflow-hidden rounded-sm bg-bork-card p-8 transition hover:bg-bork-header">
+          <p class="text-[11px] uppercase tracking-wide text-bork-muted">Бутики</p>
+          <h3 class="mt-3 text-2xl font-light text-white">Посетите монобрендовый бутик BORK</h3>
+          <p class="mt-4 text-sm text-bork-muted">Более 75 бутиков в 29 городах России и СНГ. Полный ассортимент и персональная консультация.</p>
+          <span class="mt-8 inline-block text-sm text-white underline-offset-4 group-hover:underline">Найти бутик</span>
         </a>
-        <a href="#" class="group overflow-hidden rounded-sm bg-white p-8 transition hover:shadow-lg">
-          <p class="text-[11px] uppercase tracking-wide text-bork-gray">Доставка</p>
-          <h3 class="mt-3 text-2xl font-light">Бесплатная доставка по России</h3>
-          <p class="mt-4 text-sm text-bork-gray">Премиальный сервис доставки. Оформление заказа онлайн или в бутике.</p>
-          <span class="mt-8 inline-block text-sm underline-offset-4 group-hover:underline">Подробнее</span>
+        <a href="#" class="group overflow-hidden rounded-sm bg-bork-card p-8 transition hover:bg-bork-header">
+          <p class="text-[11px] uppercase tracking-wide text-bork-muted">Доставка</p>
+          <h3 class="mt-3 text-2xl font-light text-white">Бесплатная доставка по России</h3>
+          <p class="mt-4 text-sm text-bork-muted">Премиальный сервис доставки. Оформление заказа онлайн или в бутике.</p>
+          <span class="mt-8 inline-block text-sm text-white underline-offset-4 group-hover:underline">Подробнее</span>
         </a>
-        <a href="#" class="group overflow-hidden rounded-sm bg-white p-8 transition hover:shadow-lg">
-          <p class="text-[11px] uppercase tracking-wide text-bork-gray">Консьерж-сервис</p>
-          <h3 class="mt-3 text-2xl font-light">Доставка на Mercedes-Benz</h3>
-          <p class="mt-4 text-sm text-bork-gray">Эксклюзивный сервис доставки заказов для клиентов BORK в Москве и Санкт-Петербурге.</p>
-          <span class="mt-8 inline-block text-sm underline-offset-4 group-hover:underline">Узнать больше</span>
+        <a href="#" class="group overflow-hidden rounded-sm bg-bork-card p-8 transition hover:bg-bork-header">
+          <p class="text-[11px] uppercase tracking-wide text-bork-muted">Консьерж-сервис</p>
+          <h3 class="mt-3 text-2xl font-light text-white">Доставка на Mercedes-Benz</h3>
+          <p class="mt-4 text-sm text-bork-muted">Эксклюзивный сервис доставки заказов для клиентов BORK в Москве и Санкт-Петербурге.</p>
+          <span class="mt-8 inline-block text-sm text-white underline-offset-4 group-hover:underline">Узнать больше</span>
         </a>
       </div>
     </section>
@@ -591,27 +704,27 @@
         <a href="#" class="hidden text-sm underline-offset-4 hover:underline md:inline">Все статьи</a>
       </div>
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <a href="#" class="article-card group overflow-hidden rounded-sm bg-white">
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
           <div class="overflow-hidden"><img src="https://st.bork.ru/pages/kak-vybrat-gril.png" alt="" class="h-52 w-full object-cover" /></div>
           <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Кухня</p><h3 class="mt-2 text-lg font-light leading-snug">Как выбрать гриль для дома и дачи</h3></div>
         </a>
-        <a href="#" class="article-card group overflow-hidden rounded-sm bg-white">
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
           <div class="overflow-hidden"><img src="https://st.bork.ru/pages/vybor-beauty-gadzhetov.png" alt="" class="h-52 w-full object-cover" /></div>
           <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Красота и здоровье</p><h3 class="mt-2 text-lg font-light leading-snug">6 бьюти-гаджетов, которые действительно работают</h3></div>
         </a>
-        <a href="#" class="article-card group overflow-hidden rounded-sm bg-white">
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
           <div class="overflow-hidden"><img src="https://st.bork.ru/pages/podarki-na-svadbu.png" alt="" class="h-52 w-full object-cover" /></div>
           <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Идеи подарков</p><h3 class="mt-2 text-lg font-light leading-snug">Что дарить на свадьбу? Идеи подарков</h3></div>
         </a>
-        <a href="#" class="article-card group overflow-hidden rounded-sm bg-white">
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
           <div class="overflow-hidden"><img src="https://st.bork.ru/pages/kak-vybrat-idealnye-kapsuly.png" alt="" class="h-52 w-full object-cover" /></div>
           <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Кофе</p><h3 class="mt-2 text-lg font-light leading-snug">Путеводитель по кофе в капсулах</h3></div>
         </a>
-        <a href="#" class="article-card group overflow-hidden rounded-sm bg-white">
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
           <div class="overflow-hidden"><img src="https://st.bork.ru/pages/vybor-aromadiffuzora.png" alt="" class="h-52 w-full object-cover" /></div>
           <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">BORK HOME</p><h3 class="mt-2 text-lg font-light leading-snug">Обзор ароматов для дома</h3></div>
         </a>
-        <a href="#" class="article-card group overflow-hidden rounded-sm bg-white">
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
           <div class="overflow-hidden"><img src="https://st.bork.ru/pages/gadzhety-dlya-puteshestviy.png" alt="" class="h-52 w-full object-cover" /></div>
           <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Outdoor</p><h3 class="mt-2 text-lg font-light leading-snug">Гаджеты для путешествий</h3></div>
         </a>
@@ -689,10 +802,10 @@
   </footer>
 
   <!-- Cookie banner -->
-  <div id="cookieBar" class="cookie-bar fixed inset-x-0 bottom-0 z-[80] border-t border-bork-line bg-white px-5 py-5 md:px-10">
+  <div id="cookieBar" class="cookie-bar fixed inset-x-0 bottom-0 z-[80] border-t border-bork-line bg-bork-header px-5 py-5 md:px-10">
     <div class="mx-auto flex max-w-site flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-      <p class="max-w-3xl text-sm text-bork-gray">Для улучшения работы сайта мы используем файлы cookie. Продолжая использовать сайт, вы соглашаетесь с <a href="#" class="underline">политикой конфиденциальности</a>.</p>
-      <button id="cookieAccept" type="button" class="shrink-0 bg-bork-black px-8 py-3 text-xs uppercase tracking-wide text-white">Принять</button>
+      <p class="max-w-3xl text-sm text-bork-muted">Для улучшения работы сайта мы используем файлы cookie. Продолжая использовать сайт, вы соглашаетесь с <a href="#" class="text-white underline">политикой конфиденциальности</a>.</p>
+      <button id="cookieAccept" type="button" class="shrink-0 border border-white/20 px-8 py-3 text-xs uppercase tracking-wide text-white transition hover:bg-white hover:text-bork-brown">Принять</button>
     </div>
   </div>
 
@@ -702,7 +815,116 @@
     const $$ = (s) => document.querySelectorAll(s);
 
     const siteHeader = $('#siteHeader');
-    const heroSection = document.querySelector('section.relative.h-screen');
+    const heroScrollWrap = $('#heroScrollWrap');
+    const heroScroller = $('#heroScroller');
+    const heroBottomBar = $('#heroBottomBar');
+    const pageMain = $('#pageMain');
+    const heroSlides = [...$$('.hero-slide')];
+
+    let sliderLocked = true;
+    let sliderComplete = false;
+    let wheelCooldown = false;
+
+    const getSlideHeight = () => heroSlides[0]?.offsetHeight || (window.innerHeight - 60);
+
+    const getCurrentSlideIndex = () => {
+      const h = getSlideHeight();
+      return Math.min(heroSlides.length - 1, Math.max(0, Math.round(heroScroller.scrollTop / h)));
+    };
+
+    const scrollToSlide = (index, smooth = true) => {
+      const clamped = Math.max(0, Math.min(heroSlides.length - 1, index));
+      heroScroller.scrollTo({ top: clamped * getSlideHeight(), behavior: smooth ? 'smooth' : 'auto' });
+    };
+
+    const updateSlideStates = () => {
+      const idx = getCurrentSlideIndex();
+      heroSlides.forEach((slide, i) => {
+        slide.classList.toggle('is-visible', i === idx);
+      });
+      const isLast = idx >= heroSlides.length - 1;
+      heroBottomBar.classList.toggle('is-last', isLast && sliderComplete);
+      siteHeader.classList.add('has-header-bg');
+    };
+
+    const unlockPage = () => {
+      if (sliderComplete) return;
+      sliderComplete = true;
+      sliderLocked = false;
+      document.body.classList.remove('slider-locked');
+      heroScrollWrap.classList.add('is-complete');
+      pageMain.classList.add('is-active');
+      heroBottomBar.style.display = 'none';
+      window.scrollTo({ top: heroScrollWrap.offsetHeight - 1, behavior: 'smooth' });
+    };
+
+    const handleWheel = (e) => {
+      if (!sliderLocked || sliderComplete) return;
+      const idx = getCurrentSlideIndex();
+
+      if (e.deltaY > 0) {
+        e.preventDefault();
+        if (wheelCooldown) return;
+        wheelCooldown = true;
+        if (idx < heroSlides.length - 1) scrollToSlide(idx + 1);
+        else unlockPage();
+        setTimeout(() => { wheelCooldown = false; }, 700);
+      } else if (e.deltaY < 0 && idx > 0) {
+        e.preventDefault();
+        if (wheelCooldown) return;
+        wheelCooldown = true;
+        scrollToSlide(idx - 1);
+        setTimeout(() => { wheelCooldown = false; }, 700);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+
+    heroScroller.addEventListener('scroll', () => {
+      updateSlideStates();
+    }, { passive: true });
+
+    let touchStartY = 0;
+    heroScrollWrap.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    heroScrollWrap.addEventListener('touchmove', (e) => {
+      if (!sliderLocked || sliderComplete) return;
+      const deltaY = touchStartY - e.touches[0].clientY;
+      if (Math.abs(deltaY) < 8) return;
+      const fake = { deltaY: deltaY > 0 ? 120 : -120, preventDefault: () => e.preventDefault() };
+      handleWheel(fake);
+      touchStartY = e.touches[0].clientY;
+    }, { passive: false });
+
+    heroBottomBar.addEventListener('click', () => {
+      if (sliderComplete) return;
+      const idx = getCurrentSlideIndex();
+      if (idx < heroSlides.length - 1) scrollToSlide(idx + 1);
+      else unlockPage();
+    });
+
+    heroSlides.forEach((slide, i) => {
+      slide.addEventListener('click', (e) => {
+        if (sliderComplete) return;
+        const idx = getCurrentSlideIndex();
+        if (i === idx && i < heroSlides.length - 1) {
+          e.preventDefault();
+          scrollToSlide(i + 1);
+        }
+      });
+    });
+
+    const slideObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+      });
+    }, { root: heroScroller, threshold: 0.55 });
+    heroSlides.forEach((slide) => slideObserver.observe(slide));
+
+    updateSlideStates();
+    heroSlides[0]?.classList.add('is-visible');
+    siteHeader.classList.add('has-header-bg');
 
     const openPanel = (panel) => {
       panel.classList.add('is-open');
@@ -712,7 +934,7 @@
     const closePanel = (panel) => {
       panel.classList.remove('is-open');
       panel.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      document.body.style.overflow = sliderLocked && !sliderComplete ? 'hidden' : '';
     };
 
     const menuOverlay = $('#menuOverlay');
@@ -742,13 +964,6 @@
       closeCart();
     });
 
-    const heroSwiper = new Swiper('.hero-swiper', {
-      loop: true, speed: 1100, effect: 'fade', fadeEffect: { crossFade: true },
-      autoplay: { delay: 5500, disableOnInteraction: false },
-      pagination: { el: '.hero-pagination', clickable: true },
-      navigation: { nextEl: '.hero-next', prevEl: '.hero-prev' },
-    });
-
     const initProductSwiper = (name) => {
       new Swiper(`[data-collection="${name}"]`, {
         slidesPerView: 'auto', spaceBetween: 16,
@@ -758,12 +973,9 @@
     };
     ['fans', 'vacuum', 'massage', 'home'].forEach(initProductSwiper);
 
-    const onScroll = () => {
-      const threshold = heroSection ? heroSection.offsetHeight - 72 : 400;
-      siteHeader.classList.toggle('is-scrolled', window.scrollY > threshold);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    window.addEventListener('scroll', () => {
+      siteHeader.classList.toggle('has-header-bg', window.scrollY > 20 || sliderLocked);
+    }, { passive: true });
 
     const cookieBar = $('#cookieBar');
     if (!localStorage.getItem('bork-cookie-accepted')) {
@@ -792,8 +1004,8 @@
       }
       const matches = products.filter((p) => p.name.toLowerCase().includes(q));
       searchResults.innerHTML = matches.length
-        ? '<p class="text-[11px] uppercase tracking-wide text-bork-gray">Результаты</p><div class="mt-4 space-y-3">' + matches.map((p) => `<a href="#" class="block rounded-sm border border-black/10 bg-white px-4 py-3 hover:border-black/20"><span class="block text-sm">${p.name}</span><span class="text-sm text-bork-gray">${p.price}</span></a>`).join('') + '</div>'
-        : '<p class="text-sm text-bork-gray">Ничего не найдено</p>';
+        ? '<p class="text-[11px] uppercase tracking-wide text-bork-gray">Результаты</p><div class="mt-4 space-y-3">' + matches.map((p) => `<a href="#" class="block rounded-sm border border-black/10 bg-white px-4 py-3 hover:border-black/20"><span class="block text-sm">${p.name}</span><span class="text-sm text-bork-muted">${p.price}</span></a>`).join('') + '</div>'
+        : '<p class="text-sm text-bork-muted">Ничего не найдено</p>';
     });
   </script>
 </body>
