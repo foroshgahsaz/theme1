@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BORK — Продуманное превосходство</title>
-  <meta name="description" content="Официальный сайт BORK. Продуманное превосходство." />
+  <meta name="description" content="Официальный сайт BORK. Коллекция элитной техники для кухни, микроклимата и аксессуаров для дома." />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -21,358 +21,1009 @@
             bork: {
               black: '#111111',
               charcoal: '#1c1c1c',
+              brown: '#3a3330',
+              header: '#2e2826',
+              muted: '#9d9390',
               gray: '#8a8a8a',
               light: '#f5f5f3',
-              accent: '#c45c26',
+              line: 'rgba(255,255,255,0.1)',
+              accent: '#ef6f2e',
+              card: '#312a28',
             },
           },
           letterSpacing: {
             bork: '0.35em',
             wide: '0.2em',
           },
+          maxWidth: {
+            site: '1600px',
+          },
         },
       },
     };
   </script>
   <style>
-    html, body { height: 100%; }
-    body { -webkit-font-smoothing: antialiased; }
+    :root {
+      --bottom-gap: 60px;
+      --header-bg-color: rgba(46, 40, 38, 0.8);
+      --header-bg-hover-color: #3a3330;
+      --header-font-color: #fff;
+      --body-font-title-color: #fff;
+      --body-font-desc-color: #fff;
+      --body-bg-color: #3a3330;
+      --footer-bg-color: #2e2826;
+      --product-review-bg-color: #312a28;
+      --body-bg: var(--body-bg-color);
+      --header-bg: var(--header-bg-color);
+    }
+    body { -webkit-font-smoothing: antialiased; background: var(--body-bg); color: #fff; }
+    body.slider-locked { overflow: hidden; height: 100vh; height: 100dvh; }
 
-    .hero-swiper .swiper-slide {
+    .hero-scroll-wrap {
+      position: relative;
+      height: 100vh;
+      height: 100dvh;
+      background: var(--body-bg);
+    }
+    .hero-scroller {
+      height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scroll-snap-type: y mandatory;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .hero-scroller::-webkit-scrollbar { display: none; }
+    .hero-slide {
+      position: relative;
+      display: flex;
+      flex-shrink: 0;
+      flex-direction: column;
+      width: 100%;
+      height: calc(100dvh - var(--bottom-gap));
+      min-height: calc(100vh - var(--bottom-gap));
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      background: var(--body-bg);
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .hero-slide__inner {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
       height: 100%;
     }
-
-    .hero-swiper .swiper-slide-active .slide-caption {
-      opacity: 1;
-      transform: translateY(0);
+    .hero-slide__media { position: absolute; inset: 0; overflow: hidden; }
+    .hero-slide__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transform: scale(1.02);
+      transition: transform 1.2s ease;
     }
-
-    .slide-caption {
+    .hero-slide:hover .hero-slide__media img { transform: scale(1.05); }
+    .hero-slide__shade::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+      height: 167px;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+    }
+    .hero-slide__caption {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 960px;
+      margin: auto auto 0;
+      padding: 0 32px 64px;
+      color: #fff;
+      text-align: center;
+    }
+    .hero-slide__title {
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 35px;
+      letter-spacing: 1px;
+      transform: translateY(30px);
       opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.9s ease 0.25s, transform 0.9s ease 0.25s;
+      transition: transform 800ms ease 300ms, opacity 800ms ease 300ms;
     }
-
-    .hero-pagination .swiper-pagination-bullet {
-      width: 48px;
-      height: 2px;
-      border-radius: 0;
-      background: rgba(255, 255, 255, 0.35);
+    .hero-slide.is-visible .hero-slide__title {
+      transform: translateY(0);
       opacity: 1;
-      margin: 0 4px !important;
-      transition: background 0.35s ease, transform 0.35s ease;
+    }
+    @media (max-width: 767px) {
+      .hero-slide__caption { max-width: 480px; padding: 0 16px 64px; }
+      .hero-slide__title { font-size: 18px; line-height: 23px; transition-delay: 0ms; }
+    }
+    .hero-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: var(--bottom-gap);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 200;
+      letter-spacing: 0.12em;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: opacity 200ms ease;
+    }
+    .hero-bottom-bar:hover { opacity: 0.75; }
+    .hero-bottom-bar.is-last { cursor: default; }
+    .hero-scroll-wrap.is-complete { height: auto; min-height: 100dvh; }
+    .hero-scroll-wrap.is-complete .hero-scroller { overflow: visible; scroll-snap-type: none; }
+    .hero-scroll-wrap.is-complete .hero-bottom-bar { display: none; }
+    #pageMain.is-active { opacity: 1; transform: translateY(0); }
+
+    #siteHeader {
+      background: transparent;
+      transition: background 300ms ease;
+    }
+    #siteHeader.has-header-bg {
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
     }
 
-    .hero-pagination .swiper-pagination-bullet-active {
-      background: #fff;
-      transform: scaleY(1.5);
-    }
-
-    .menu-overlay {
+    .panel-overlay {
       clip-path: inset(0 100% 0 0);
-      transition: clip-path 0.55s cubic-bezier(0.77, 0, 0.175, 1);
+      transition: clip-path .55s cubic-bezier(.77,0,.175,1);
     }
-
-    .menu-overlay.is-open {
-      clip-path: inset(0 0 0 0);
-    }
-
-    .icon-btn {
-      transition: opacity 0.2s ease;
-    }
-
-    .icon-btn:hover {
-      opacity: 0.65;
-    }
+    .panel-overlay.is-open { clip-path: inset(0 0 0 0); }
+    .icon-btn { transition: opacity .2s ease; }
+    .icon-btn:hover { opacity: .65; }
+    .product-swiper .swiper-slide { width: auto; }
+    .product-card img { transition: transform .45s ease; }
+    .product-card:hover img { transform: scale(1.04); }
+    .category-tile img { transition: transform .6s ease; }
+    .category-tile:hover img { transform: scale(1.05); }
+    .article-card img { transition: transform .55s ease; }
+    .article-card:hover img { transform: scale(1.04); }
+    .cookie-bar { transform: translateY(100%); transition: transform .45s ease; }
+    .cookie-bar.is-visible { transform: translateY(0); }
+    .drawer { transform: translateX(100%); transition: transform .45s cubic-bezier(.77,0,.175,1); }
+    .drawer.is-open { transform: translateX(0); }
   </style>
 </head>
-<body class="bg-bork-black text-white font-sans antialiased overflow-x-hidden">
+<body class="slider-locked font-sans antialiased overflow-x-hidden text-white">
 
   <!-- Header -->
-  <header class="fixed inset-x-0 top-0 z-50">
-    <div class="mx-auto flex h-[72px] max-w-[1600px] items-center justify-between px-5 md:px-10 lg:px-14">
-      <!-- Left: menu -->
+  <header id="siteHeader" class="fixed inset-x-0 top-0 z-50 text-white transition-colors duration-300">
+    <div class="mx-auto flex h-[72px] max-w-site items-center justify-between px-5 md:px-10 lg:px-14">
       <div class="flex w-[120px] items-center md:w-[180px]">
-        <button
-          id="menuBtn"
-          type="button"
-          class="icon-btn flex items-center gap-3 text-[11px] uppercase tracking-wide"
-          aria-label="Открыть меню"
-          aria-expanded="false"
-        >
+        <button id="menuBtn" type="button" class="icon-btn header-dark flex items-center gap-3 text-[11px] uppercase tracking-wide" aria-label="Открыть меню" aria-expanded="false">
           <span class="flex flex-col gap-[5px]" aria-hidden="true">
-            <span class="block h-px w-5 bg-white"></span>
-            <span class="block h-px w-5 bg-white"></span>
+            <span class="header-line block h-px w-5 bg-white"></span>
+            <span class="header-line block h-px w-5 bg-white"></span>
           </span>
           <span class="hidden sm:inline">Меню</span>
         </button>
       </div>
-
-      <!-- Center: logo -->
-      <a href="#" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[18px] font-medium tracking-bork md:text-[20px]">
-        BORK
-      </a>
-
-      <!-- Right: actions -->
-      <div class="flex w-[120px] items-center justify-end gap-4 md:w-[180px] md:gap-5">
-        <button type="button" class="icon-btn hidden text-[11px] uppercase tracking-wide sm:inline" aria-label="Язык">
-          <span class="text-white">Рус</span>
-          <span class="mx-1 text-white/40">/</span>
-          <span class="text-white/50">Eng</span>
+      <a href="#" class="header-dark absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[18px] font-medium tracking-bork md:text-[20px]">BORK</a>
+      <div class="flex w-[120px] items-center justify-end gap-3 md:w-[200px] md:gap-4">
+        <button type="button" class="icon-btn header-dark hidden text-[11px] uppercase tracking-wide sm:inline" aria-label="Язык">
+          <span>Рус</span><span class="header-muted mx-1">/</span><span class="header-muted">Eng</span>
         </button>
-        <button type="button" class="icon-btn" aria-label="Поиск">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="7"></circle>
-            <path d="M20 20l-3.5-3.5"></path>
-          </svg>
+        <button id="searchBtn" type="button" class="icon-btn header-icon" aria-label="Поиск">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
         </button>
-        <button type="button" class="icon-btn hidden md:block" aria-label="Личный кабинет">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <circle cx="12" cy="8" r="4"></circle>
-            <path d="M5 20c1.5-3 4-5 7-5s5.5 2 7 5"></path>
-          </svg>
+        <button id="accountBtn" type="button" class="icon-btn header-icon hidden md:block" aria-label="Личный кабинет">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 20c1.5-3 4-5 7-5s5.5 2 7 5"></path></svg>
         </button>
-        <button type="button" class="icon-btn" aria-label="Корзина">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path d="M6 7h15l-1.5 9h-12z"></path>
-            <path d="M6 7l-1-3H3"></path>
-            <circle cx="9" cy="19" r="1.2"></circle>
-            <circle cx="17" cy="19" r="1.2"></circle>
-          </svg>
+        <button id="cartBtn" type="button" class="icon-btn header-icon relative" aria-label="Корзина">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 7h15l-1.5 9h-12z"></path><path d="M6 7l-1-3H3"></path><circle cx="9" cy="19" r="1.2"></circle><circle cx="17" cy="19" r="1.2"></circle></svg>
+          <span class="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-bork-accent text-[9px] text-white">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Fullscreen menu -->
-  <div
-    id="menuOverlay"
-    class="menu-overlay fixed inset-0 z-[60] bg-bork-light text-bork-black"
-    aria-hidden="true"
-  >
-    <div class="flex h-full flex-col">
+  <!-- Menu overlay -->
+  <div id="menuOverlay" class="panel-overlay fixed inset-0 z-[60] overflow-y-auto bg-bork-light text-bork-black" aria-hidden="true">
+    <div class="flex min-h-full flex-col">
       <div class="flex items-center justify-between px-5 py-6 md:px-14">
-        <button id="menuClose" type="button" class="text-[11px] uppercase tracking-wide" aria-label="Закрыть меню">
-          Закрыть
-        </button>
+        <button id="menuClose" type="button" class="text-[11px] uppercase tracking-wide">Закрыть</button>
         <span class="text-[18px] font-medium tracking-bork">BORK</span>
-        <div class="text-[11px] uppercase tracking-wide">
-          <span>Рус</span>
-          <span class="mx-1 text-black/30">/</span>
-          <span class="text-black/40">Eng</span>
-        </div>
+        <div class="text-[11px] uppercase tracking-wide"><span>Рус</span><span class="mx-1 text-black/30">/</span><span class="text-black/40">Eng</span></div>
       </div>
 
-      <nav class="flex flex-1 flex-col justify-center px-8 md:px-20">
-        <ul class="space-y-4 md:space-y-5">
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Новинки</a></li>
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Идеи подарков</a></li>
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Кухня</a></li>
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Дом</a></li>
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Красота и здоровье</a></li>
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Outdoor</a></li>
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">BORK Home</a></li>
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Voyage</a></li>
-          <li><a class="text-2xl font-light tracking-wide transition hover:opacity-60 md:text-4xl" href="#">Interior</a></li>
-        </ul>
-      </nav>
+      <div class="px-5 md:px-14">
+        <label class="relative block">
+          <span class="sr-only">Поиск</span>
+          <input type="search" placeholder="Поиск" class="w-full rounded-full border border-black/15 bg-transparent px-5 py-3 text-sm outline-none transition focus:border-black/40 focus:bg-white" />
+          <svg class="pointer-events-none absolute right-5 top-1/2 h-4 w-4 -translate-y-1/2 text-black/40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        </label>
+      </div>
 
-      <div class="border-t border-black/10 px-8 py-8 md:px-20">
-        <a href="tel:88005008899" class="text-sm tracking-wide text-bork-gray hover:text-bork-black">8 800 500 88 99</a>
+      <div class="grid flex-1 grid-cols-2 gap-3 px-5 py-8 md:grid-cols-3 md:gap-4 md:px-14 lg:grid-cols-4">
+        <a href="#" class="category-tile group relative overflow-hidden rounded-sm"><img src="https://st.bork.ru/images/catalog/blur/hs841.jpg" alt="Новинки" class="h-36 w-full object-cover md:h-44" /><span class="absolute inset-0 bg-black/20 transition group-hover:bg-black/30"></span><span class="absolute bottom-4 left-4 text-sm font-light text-white md:text-base">Новинки</span></a>
+        <a href="#" class="category-tile group relative overflow-hidden rounded-sm"><img src="https://st.bork.ru/images/catalog/blur/gift-ideas.jpg" alt="Идеи подарков" class="h-36 w-full object-cover md:h-44" /><span class="absolute inset-0 bg-black/20 transition group-hover:bg-black/30"></span><span class="absolute bottom-4 left-4 text-sm font-light text-white md:text-base">Идеи подарков</span></a>
+        <a href="#" class="category-tile group relative overflow-hidden rounded-sm"><img src="https://st.bork.ru/images/catalog/blur/kitchen.jpg" alt="Кухня" class="h-36 w-full object-cover md:h-44" /><span class="absolute inset-0 bg-black/20 transition group-hover:bg-black/30"></span><span class="absolute bottom-4 left-4 text-sm font-light text-white md:text-base">Кухня</span></a>
+        <a href="#" class="category-tile group relative overflow-hidden rounded-sm"><img src="https://st.bork.ru/images/catalog/blur/home.jpg" alt="Дом" class="h-36 w-full object-cover md:h-44" /><span class="absolute inset-0 bg-black/20 transition group-hover:bg-black/30"></span><span class="absolute bottom-4 left-4 text-sm font-light text-white md:text-base">Дом</span></a>
+        <a href="#" class="category-tile group relative overflow-hidden rounded-sm"><img src="https://st.bork.ru/images/catalog/blur/f732-ch-or.jpg" alt="Красота и здоровье" class="h-36 w-full object-cover md:h-44" /><span class="absolute inset-0 bg-black/20 transition group-hover:bg-black/30"></span><span class="absolute bottom-4 left-4 text-sm font-light text-white md:text-base">Красота и здоровье</span></a>
+        <a href="#" class="category-tile group relative overflow-hidden rounded-sm"><img src="https://st.bork.ru/images/catalog/blur/g614.jpg" alt="Outdoor" class="h-36 w-full object-cover md:h-44" /><span class="absolute inset-0 bg-black/20 transition group-hover:bg-black/30"></span><span class="absolute bottom-4 left-4 text-sm font-light text-white md:text-base">Outdoor</span></a>
+        <a href="#" class="category-tile group relative overflow-hidden rounded-sm"><img src="https://st.bork.ru/images/catalog/blur/tea-bh.jpg" alt="BORK Home" class="h-36 w-full object-cover md:h-44" /><span class="absolute inset-0 bg-black/20 transition group-hover:bg-black/30"></span><span class="absolute bottom-4 left-4 text-sm font-light text-white md:text-base">BORK Home</span></a>
+        <a href="#" class="category-tile group relative overflow-hidden rounded-sm"><img src="https://st.bork.ru/images/catalog/blur/beauty.jpg" alt="Interior" class="h-36 w-full object-cover md:h-44" /><span class="absolute inset-0 bg-black/20 transition group-hover:bg-black/30"></span><span class="absolute bottom-4 left-4 text-sm font-light text-white md:text-base">Interior</span></a>
+      </div>
+
+      <div class="border-t border-black/10 px-5 py-8 md:px-14">
+        <div class="grid gap-8 md:grid-cols-2">
+          <div>
+            <p class="mb-4 text-[11px] uppercase tracking-wide text-bork-gray">Мобильное приложение BORK</p>
+            <div class="flex items-center gap-4">
+              <div class="flex h-24 w-24 items-center justify-center rounded bg-white p-2 shadow-sm">
+                <svg viewBox="0 0 100 100" class="h-full w-full text-bork-black"><rect x="8" y="8" width="24" height="24"></rect><rect x="40" y="8" width="24" height="24"></rect><rect x="72" y="8" width="20" height="24"></rect><rect x="8" y="40" width="24" height="24"></rect><rect x="40" y="40" width="24" height="24"></rect><rect x="72" y="40" width="20" height="24"></rect><rect x="8" y="72" width="24" height="20"></rect><rect x="40" y="72" width="24" height="20"></rect><rect x="72" y="72" width="20" height="20"></rect></svg>
+              </div>
+              <div class="space-y-2 text-sm text-bork-muted">
+                <p>Отсканируйте камерой, чтобы скачать</p>
+                <div class="flex gap-2">
+                  <span class="rounded border border-black/10 px-3 py-1.5 text-xs">App Store</span>
+                  <span class="rounded border border-black/10 px-3 py-1.5 text-xs">Google Play</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-3 text-sm">
+            <a href="#" class="block hover:opacity-60">О BORK</a>
+            <a href="#" class="block hover:opacity-60">Бутики</a>
+            <a href="#" class="block hover:opacity-60">Контакты</a>
+            <button type="button" class="block text-left hover:opacity-60">Москва</button>
+            <button id="menuAccountBtn" type="button" class="block text-left hover:opacity-60">Войти в личный кабинет</button>
+          </div>
+        </div>
+        <a href="tel:88005008899" class="mt-8 inline-block text-sm tracking-wide text-bork-gray hover:text-bork-black">8 800 500 88 99</a>
       </div>
     </div>
   </div>
 
-  <!-- Hero slider -->
-  <main class="relative h-screen min-h-[640px] w-full">
-    <div class="swiper hero-swiper h-full w-full">
-      <div class="swiper-wrapper">
+  <!-- Search overlay -->
+  <div id="searchOverlay" class="panel-overlay fixed inset-0 z-[60] bg-bork-light text-bork-black" aria-hidden="true">
+    <div class="flex h-full flex-col">
+      <div class="flex items-center justify-between px-5 py-6 md:px-14">
+        <button id="searchClose" type="button" class="text-[11px] uppercase tracking-wide">Закрыть</button>
+        <span class="text-[18px] font-medium tracking-bork">BORK</span>
+        <div class="text-[11px] uppercase tracking-wide"><span>Рус</span><span class="mx-1 text-black/30">/</span><span class="text-black/40">Eng</span></div>
+      </div>
+      <div class="px-5 md:px-14">
+        <label class="relative block">
+          <span class="sr-only">Поиск</span>
+          <input id="searchInput" type="search" placeholder="Поиск" class="w-full rounded-full border border-black/15 bg-white px-5 py-4 text-base outline-none focus:border-black/40" autofocus />
+        </label>
+        <div id="searchResults" class="mt-8 space-y-4">
+          <p class="text-[11px] uppercase tracking-wide text-bork-gray">Популярные категории</p>
+          <div class="flex flex-wrap gap-2">
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Новинки</a>
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Идеи подарков</a>
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Кухня</a>
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Дом</a>
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Красота и здоровье</a>
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Outdoor</a>
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">BORK Home</a>
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Voyage</a>
+            <a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Interior</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Slide 1 -->
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
+  <!-- Account overlay -->
+  <div id="accountOverlay" class="panel-overlay fixed inset-0 z-[60] bg-bork-light text-bork-black" aria-hidden="true">
+    <div class="flex h-full flex-col">
+      <div class="flex items-center justify-between px-5 py-6 md:px-14">
+        <button id="accountClose" type="button" class="text-[11px] uppercase tracking-wide">Закрыть</button>
+        <span class="text-[18px] font-medium tracking-bork">BORK</span>
+        <div class="w-12"></div>
+      </div>
+      <div class="flex flex-1 flex-col justify-center px-5 md:px-14">
+        <h2 class="mb-2 text-3xl font-light md:text-4xl">Личный кабинет</h2>
+        <p class="mb-8 max-w-md text-sm text-bork-muted">Введите номер телефона для входа или регистрации</p>
+        <form class="max-w-md space-y-4" onsubmit="return false;">
+          <label class="block">
+            <span class="mb-2 block text-[11px] uppercase tracking-wide text-bork-gray">Телефон</span>
+            <input type="tel" placeholder="+7" class="w-full border-b border-black/20 bg-transparent py-3 text-lg outline-none focus:border-black" />
+          </label>
+          <button type="submit" class="w-full bg-bork-black py-4 text-sm uppercase tracking-wide text-white transition hover:bg-bork-charcoal">Подтвердить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart drawer -->
+  <div id="cartDrawer" class="drawer fixed inset-y-0 right-0 z-[70] w-full max-w-md bg-white shadow-2xl">
+    <div class="flex h-full flex-col">
+      <div class="flex items-center justify-between border-b border-bork-line px-6 py-5">
+        <h2 class="text-lg font-light">Корзина</h2>
+        <button id="cartClose" type="button" class="text-[11px] uppercase tracking-wide">Закрыть</button>
+      </div>
+      <div class="flex flex-1 flex-col items-center justify-center px-6 text-center text-bork-gray">
+        <svg class="mb-4 h-12 w-12 text-black/20" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M6 7h15l-1.5 9h-12z"></path><path d="M6 7l-1-3H3"></path></svg>
+        <p class="text-sm">Ваша корзина пуста</p>
+      </div>
+      <div class="border-t border-bork-line p-6">
+        <button type="button" class="w-full bg-bork-black py-4 text-sm uppercase tracking-wide text-white">Перейти к оформлению</button>
+      </div>
+    </div>
+  </div>
+  <div id="cartBackdrop" class="fixed inset-0 z-[65] hidden bg-black/40"></div>
+
+  <!-- Hero scroll slider (BORK-style) -->
+  <section id="heroScrollWrap" class="hero-scroll-wrap">
+    <div id="heroScroller" class="hero-scroller" aria-label="Главный слайдер">
+
+      <a href="#" class="hero-slide" data-slide="0">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
             <picture>
               <source media="(max-width: 767px)" srcset="https://st.bork.ru/home-page/a808-mob-new.jpg" />
-              <img
-                src="https://st.bork.ru/home-page/a808-desk-new.jpg"
-                alt="Сезон чистого воздуха"
-                class="absolute inset-0 h-full w-full object-cover object-center transition duration-[1.2s] group-hover:scale-[1.02]"
-              />
+              <img src="https://st.bork.ru/home-page/a808-desk-new.jpg" alt="Сезон чистого воздуха" loading="eager" />
             </picture>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
-                Сезон чистого воздуха
-              </h2>
-            </div>
-          </a>
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Сезон чистого воздуха</h2></div>
         </div>
+      </a>
 
-        <!-- Slide 2 -->
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
+      <a href="#" class="hero-slide" data-slide="1">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
             <picture>
               <source media="(max-width: 767px)" srcset="https://st.bork.ru/home-page/v888-new-mob.jpg" />
-              <img
-                src="https://st.bork.ru/home-page/v888-new-desk.jpg"
-                alt="Моющие пылесосы Neuron"
-                class="absolute inset-0 h-full w-full object-cover object-center transition duration-[1.2s] group-hover:scale-[1.02]"
-              />
+              <img src="https://st.bork.ru/home-page/v888-new-desk.jpg" alt="Моющие пылесосы Neuron" loading="lazy" />
             </picture>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[16ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
-                Моющие пылесосы Neuron
-              </h2>
-            </div>
-          </a>
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Моющие пылесосы Neuron</h2></div>
         </div>
+      </a>
 
-        <!-- Slide 3 -->
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
-            <img
-              src="https://st.bork.ru/home-page/610-desk-b.jpg"
-              alt="Приготовьтесь к BBQ-сезону"
-              class="absolute inset-0 h-full w-full object-cover object-center transition duration-[1.2s] group-hover:scale-[1.02]"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
-                Приготовьтесь к BBQ-сезону
-              </h2>
-            </div>
-          </a>
+      <a href="#" class="hero-slide" data-slide="2">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
+            <img src="https://st.bork.ru/home-page/610-desk-b.jpg" alt="Приготовьтесь к BBQ-сезону" loading="lazy" />
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Приготовьтесь к BBQ-сезону</h2></div>
         </div>
+      </a>
 
-        <!-- Slide 4 -->
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
+      <a href="#" class="hero-slide" data-slide="3">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
             <div class="absolute inset-0 bg-[#171717]"></div>
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(196,92,38,0.22),transparent_55%)]"></div>
-            <div class="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.04),transparent_45%)]"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
-                Порадуйте себя новинками
-              </h2>
-            </div>
-          </a>
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Порадуйте себя новинками</h2></div>
         </div>
+      </a>
 
-        <!-- Slide 5 -->
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
-            <picture>
-              <source media="(max-width: 767px)" srcset="https://st.bork.ru/home-page/bork-home-mobile.jpg" />
-              <img
-                src="https://st.bork.ru/home-page/bork-home-mobile.jpg"
-                alt="Коллекция BORK HOME"
-                class="absolute inset-0 h-full w-full object-cover object-center transition duration-[1.2s] group-hover:scale-[1.02]"
-              />
-            </picture>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[14ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
-                Коллекция BORK HOME
-              </h2>
-            </div>
-          </a>
+      <a href="#" class="hero-slide" data-slide="4">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
+            <img src="https://st.bork.ru/home-page/bork-home-mobile.jpg" alt="Коллекция BORK HOME" loading="lazy" />
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Коллекция BORK HOME</h2></div>
         </div>
+      </a>
 
-        <!-- Slide 6 -->
-        <div class="swiper-slide">
-          <a href="#" class="group relative block h-full w-full overflow-hidden">
+      <a href="#" class="hero-slide" data-slide="5">
+        <div class="hero-slide__inner hero-slide__shade">
+          <div class="hero-slide__media">
             <div class="absolute inset-0 bg-[#121212]"></div>
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_60%,rgba(255,255,255,0.08),transparent_50%)]"></div>
-            <div class="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.45))]"></div>
-            <div class="slide-caption absolute bottom-[120px] left-5 md:bottom-[140px] md:left-14 lg:left-20">
-              <h2 class="max-w-[12ch] text-[28px] font-light leading-tight tracking-wide md:text-[42px] lg:text-[48px]">
-                Персонализация
-              </h2>
-            </div>
-          </a>
+          </div>
+          <div class="hero-slide__caption"><h2 class="hero-slide__title">Персонализация</h2></div>
         </div>
+      </a>
 
+    </div>
+
+    <button id="heroBottomBar" type="button" class="hero-bottom-bar" aria-label="Следующий слайд">
+      <span id="heroPhoneText">8 800 500 88 99</span>
+    </button>
+  </section>
+
+  <main id="pageMain" class="bg-bork-brown text-white opacity-0 translate-y-[100px] transition-all duration-500">
+
+    <!-- Collection 1 -->
+    <section class="mx-auto max-w-site px-5 pb-16 pt-20 md:px-10 lg:px-14">
+      <a href="#" class="group relative mb-10 block overflow-hidden rounded-sm">
+        <img src="https://st.bork.ru/components/main/popular/f732-ch-or-new.jpg" alt="Коллекция фенов и стайлеров" class="h-[220px] w-full object-cover transition duration-700 group-hover:scale-[1.02] md:h-[320px]" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <h2 class="absolute bottom-6 left-6 text-2xl font-light text-white md:bottom-8 md:left-8 md:text-4xl">Коллекция фенов и стайлеров</h2>
+      </a>
+      <div class="relative">
+        <div class="swiper product-swiper" data-collection="fans">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <span class="absolute left-3 top-3 rounded bg-bork-black px-2 py-1 text-[10px] uppercase tracking-wide text-white">Новинка</span>
+                  <img src="https://st.bork.ru/pages/f732-or.png" alt="Фен BORK F730 LE" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Фен BORK F730 LE</h3>
+                <p class="text-sm text-bork-muted">33&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/f732-or.png" alt="Фен-стайлер BORK F704" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Комплексная система лифтинга BORK F704</h3>
+                <p class="text-sm text-bork-muted">48&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/f732-or.png" alt="Увлажнитель BORK F772" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Портативный увлажнитель BORK F772</h3>
+                <p class="text-sm text-bork-muted">27&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/f732-or.png" alt="Зеркало BORK F771" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Умное зеркало BORK F771</h3>
+                <p class="text-sm text-bork-muted">29&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="collection-prev-fans icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="collection-next-fans icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
+      </div>
+    </section>
+
+    <!-- Collection 2 -->
+    <section class="mx-auto max-w-site px-5 pb-16 md:px-10 lg:px-14">
+      <a href="#" class="group relative mb-10 block overflow-hidden rounded-sm">
+        <img src="https://st.bork.ru/home-page/v888-new-desk.jpg" alt="Коллекция пылесосов Neuron" class="h-[220px] w-full object-cover transition duration-700 group-hover:scale-[1.02] md:h-[320px]" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <h2 class="absolute bottom-6 left-6 text-2xl font-light text-white md:bottom-8 md:left-8 md:text-4xl">Коллекция пылесосов Neuron</h2>
+      </a>
+      <div class="relative">
+        <div class="swiper product-swiper" data-collection="vacuum">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <span class="absolute left-3 top-3 rounded bg-bork-black px-2 py-1 text-[10px] uppercase tracking-wide text-white">Новинка</span>
+                  <img src="https://st.bork.ru/pages/v830.png" alt="Моющий пылесос V810 Neuron" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Моющий пылесос BORK V810 Neuron</h3>
+                <p class="text-sm text-bork-muted">108&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/v830.png" alt="Робот-пылесос V830" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Робот-пылесос BORK V830</h3>
+                <p class="text-sm text-bork-muted">98&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/a802.png" alt="Очиститель A802 RAIN" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Очиститель-увлажнитель BORK A802 RAIN</h3>
+                <p class="text-sm text-bork-muted">89&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/a802.png" alt="Очиститель A808" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Очиститель воздуха BORK A808</h3>
+                <p class="text-sm text-bork-muted">117&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="collection-prev-vacuum icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="collection-next-vacuum icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
+      </div>
+    </section>
+
+    <!-- Collection 3 -->
+    <section class="mx-auto max-w-site px-5 pb-16 md:px-10 lg:px-14">
+      <a href="#" class="group relative mb-10 block overflow-hidden rounded-sm">
+        <img src="https://st.bork.ru/components/main/popular/d810-wt-new.jpg" alt="Коллекция HealthTerior" class="h-[220px] w-full object-cover transition duration-700 group-hover:scale-[1.02] md:h-[320px]" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <h2 class="absolute bottom-6 left-6 text-2xl font-light text-white md:bottom-8 md:left-8 md:text-4xl">Коллекция массажёров</h2>
+      </a>
+      <div class="relative">
+        <div class="swiper product-swiper" data-collection="massage">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/d770.png" alt="Массажёр BORK D715" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Массажёр для ног BORK D715</h3>
+                <p class="text-sm text-bork-muted">59&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/d770.png" alt="Массажёр BORK D701" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Перкуссионный массажёр BORK D701</h3>
+                <p class="text-sm text-bork-muted">29&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/d770.png" alt="Массажёр BORK D708" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Массажёр для шеи BORK D708</h3>
+                <p class="text-sm text-bork-muted">39&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/d770.png" alt="Массажёр BORK D622" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Массажёр для глаз BORK D622</h3>
+                <p class="text-sm text-bork-muted">18&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="collection-prev-massage icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="collection-next-massage icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
+      </div>
+    </section>
+
+    <!-- Collection 4 -->
+    <section class="mx-auto max-w-site px-5 pb-20 md:px-10 lg:px-14">
+      <a href="#" class="group relative mb-10 block overflow-hidden rounded-sm">
+        <img src="https://st.bork.ru/home-page/bork-home-mobile.jpg" alt="Коллекция BORK HOME" class="h-[220px] w-full object-cover transition duration-700 group-hover:scale-[1.02] md:h-[320px]" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <h2 class="absolute bottom-6 left-6 text-2xl font-light text-white md:bottom-8 md:left-8 md:text-4xl">Коллекция BORK HOME</h2>
+      </a>
+      <div class="relative">
+        <div class="swiper product-swiper" data-collection="home">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/hk804-wt.png" alt="Сервировка BORK" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Набор для сервировки BORK HK804</h3>
+                <p class="text-sm text-bork-muted">45&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/l793.png" alt="Power bank BORK L795" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Power bank BORK L795</h3>
+                <p class="text-sm text-bork-muted">9&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/g702.png" alt="Вафельница BORK G702" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Вафельница BORK G702</h3>
+                <p class="text-sm text-bork-muted">39&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+            <div class="swiper-slide w-[220px] md:w-[280px]">
+              <a href="#" class="product-card block">
+                <div class="relative mb-4 flex h-[220px] items-center justify-center overflow-hidden rounded-sm bg-bork-card md:h-[280px]">
+                  <img src="https://st.bork.ru/pages/w800.png" alt="Микроволновая печь BORK W800" class="max-h-[75%] max-w-[75%] object-contain" />
+                </div>
+                <h3 class="mb-2 text-sm font-light leading-snug">Микроволновая печь BORK W800</h3>
+                <p class="text-sm text-bork-muted">63&nbsp;000&nbsp;₽</p>
+              </a>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="collection-prev-home icon-btn absolute -left-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Назад"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="collection-next-home icon-btn absolute -right-2 top-[42%] z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-bork-card shadow md:flex" aria-label="Вперёд"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"></path></svg></button>
+      </div>
+    </section>
+
+    <!-- Brand intro -->
+    <section class="border-y border-bork-line bg-bork-header py-20">
+      <div class="mx-auto max-w-3xl px-5 text-center md:px-10">
+        <p class="text-[11px] uppercase tracking-wide text-bork-muted">Продуманное превосходство</p>
+        <h2 class="mt-4 text-3xl font-light leading-snug text-white md:text-5xl">BORK — международная компания, создающая бытовую технику и аксессуары премиум-класса</h2>
+        <p class="mt-6 text-sm leading-relaxed text-bork-muted md:text-base">Коллекция элитной техники для кухни, создания комфортного микроклимата и полный ассортимент аксессуаров для дома. Официальный интернет-бутик BORK премиум-класса с доставкой по России.</p>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="mx-auto max-w-site px-5 py-20 md:px-10 lg:px-14">
+      <div class="grid gap-6 md:grid-cols-3">
+        <a href="#" class="group overflow-hidden rounded-sm bg-bork-card p-8 transition hover:bg-bork-header">
+          <p class="text-[11px] uppercase tracking-wide text-bork-muted">Бутики</p>
+          <h3 class="mt-3 text-2xl font-light text-white">Посетите монобрендовый бутик BORK</h3>
+          <p class="mt-4 text-sm text-bork-muted">Более 75 бутиков в 29 городах России и СНГ. Полный ассортимент и персональная консультация.</p>
+          <span class="mt-8 inline-block text-sm text-white underline-offset-4 group-hover:underline">Найти бутик</span>
+        </a>
+        <a href="#" class="group overflow-hidden rounded-sm bg-bork-card p-8 transition hover:bg-bork-header">
+          <p class="text-[11px] uppercase tracking-wide text-bork-muted">Доставка</p>
+          <h3 class="mt-3 text-2xl font-light text-white">Бесплатная доставка по России</h3>
+          <p class="mt-4 text-sm text-bork-muted">Премиальный сервис доставки. Оформление заказа онлайн или в бутике.</p>
+          <span class="mt-8 inline-block text-sm text-white underline-offset-4 group-hover:underline">Подробнее</span>
+        </a>
+        <a href="#" class="group overflow-hidden rounded-sm bg-bork-card p-8 transition hover:bg-bork-header">
+          <p class="text-[11px] uppercase tracking-wide text-bork-muted">Консьерж-сервис</p>
+          <h3 class="mt-3 text-2xl font-light text-white">Доставка на Mercedes-Benz</h3>
+          <p class="mt-4 text-sm text-bork-muted">Эксклюзивный сервис доставки заказов для клиентов BORK в Москве и Санкт-Петербурге.</p>
+          <span class="mt-8 inline-block text-sm text-white underline-offset-4 group-hover:underline">Узнать больше</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- App promo -->
+    <section class="bg-bork-brown py-20 text-white">
+      <div class="mx-auto flex max-w-site flex-col items-center gap-10 px-5 md:flex-row md:px-10 lg:px-14">
+        <div class="flex-1">
+          <p class="text-[11px] uppercase tracking-wide text-white/60">Мобильное приложение</p>
+          <h2 class="mt-4 text-3xl font-light md:text-4xl">Приложение BORK</h2>
+          <p class="mt-4 max-w-lg text-sm leading-relaxed text-white/70">Онлайн-бутик, рецепты бренд-шефа, чат с персональным консультантом и управление умной техникой — всё в одном приложении.</p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <span class="rounded border border-white/20 px-4 py-2 text-xs uppercase tracking-wide">App Store</span>
+            <span class="rounded border border-white/20 px-4 py-2 text-xs uppercase tracking-wide">Google Play</span>
+          </div>
+        </div>
+        <div class="flex h-48 w-48 items-center justify-center rounded bg-white p-4">
+          <svg viewBox="0 0 100 100" class="h-full w-full text-bork-brown"><rect x="8" y="8" width="24" height="24"></rect><rect x="40" y="8" width="24" height="24"></rect><rect x="72" y="8" width="20" height="24"></rect><rect x="8" y="40" width="24" height="24"></rect><rect x="40" y="40" width="24" height="24"></rect><rect x="72" y="40" width="20" height="24"></rect><rect x="8" y="72" width="24" height="20"></rect><rect x="40" y="72" width="24" height="20"></rect><rect x="72" y="72" width="20" height="20"></rect></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Articles -->
+    <section class="mx-auto max-w-site px-5 py-20 md:px-10 lg:px-14">
+      <div class="mb-10 flex items-end justify-between gap-4">
+        <div>
+          <p class="text-[11px] uppercase tracking-wide text-bork-gray">Советы BORK</p>
+          <h2 class="mt-2 text-3xl font-light md:text-4xl">Как выбрать лучшую бытовую технику</h2>
+        </div>
+        <a href="#" class="hidden text-sm underline-offset-4 hover:underline md:inline">Все статьи</a>
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
+          <div class="overflow-hidden"><img src="https://st.bork.ru/pages/kak-vybrat-gril.png" alt="" class="h-52 w-full object-cover" /></div>
+          <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Кухня</p><h3 class="mt-2 text-lg font-light leading-snug">Как выбрать гриль для дома и дачи</h3></div>
+        </a>
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
+          <div class="overflow-hidden"><img src="https://st.bork.ru/pages/vybor-beauty-gadzhetov.png" alt="" class="h-52 w-full object-cover" /></div>
+          <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Красота и здоровье</p><h3 class="mt-2 text-lg font-light leading-snug">6 бьюти-гаджетов, которые действительно работают</h3></div>
+        </a>
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
+          <div class="overflow-hidden"><img src="https://st.bork.ru/pages/podarki-na-svadbu.png" alt="" class="h-52 w-full object-cover" /></div>
+          <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Идеи подарков</p><h3 class="mt-2 text-lg font-light leading-snug">Что дарить на свадьбу? Идеи подарков</h3></div>
+        </a>
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
+          <div class="overflow-hidden"><img src="https://st.bork.ru/pages/kak-vybrat-idealnye-kapsuly.png" alt="" class="h-52 w-full object-cover" /></div>
+          <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Кофе</p><h3 class="mt-2 text-lg font-light leading-snug">Путеводитель по кофе в капсулах</h3></div>
+        </a>
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
+          <div class="overflow-hidden"><img src="https://st.bork.ru/pages/vybor-aromadiffuzora.png" alt="" class="h-52 w-full object-cover" /></div>
+          <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">BORK HOME</p><h3 class="mt-2 text-lg font-light leading-snug">Обзор ароматов для дома</h3></div>
+        </a>
+        <a href="#" class="article-card group overflow-hidden rounded-sm bg-bork-card">
+          <div class="overflow-hidden"><img src="https://st.bork.ru/pages/gadzhety-dlya-puteshestviy.png" alt="" class="h-52 w-full object-cover" /></div>
+          <div class="p-6"><p class="text-[11px] uppercase tracking-wide text-bork-gray">Outdoor</p><h3 class="mt-2 text-lg font-light leading-snug">Гаджеты для путешествий</h3></div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-bork-black text-white">
+    <div class="mx-auto max-w-site px-5 py-16 md:px-10 lg:px-14">
+      <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <p class="mb-5 text-[11px] uppercase tracking-wide text-white/50">Мир BORK</p>
+          <ul class="space-y-3 text-sm font-light">
+            <li><a href="#" class="hover:text-white/70">Мир BORK</a></li>
+            <li><a href="#" class="hover:text-white/70">Бутики</a></li>
+            <li><a href="#" class="hover:text-white/70">Контакты</a></li>
+            <li><a href="#" class="hover:text-white/70">История и награды</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="mb-5 text-[11px] uppercase tracking-wide text-white/50">Служба заботы BORK</p>
+          <ul class="space-y-3 text-sm font-light">
+            <li><a href="#" class="hover:text-white/70">Забота и сервисы</a></li>
+            <li><a href="#" class="hover:text-white/70">Служба заботы</a></li>
+            <li><a href="#" class="hover:text-white/70">Способы оплаты</a></li>
+            <li><a href="#" class="hover:text-white/70">Доставка</a></li>
+            <li><a href="#" class="hover:text-white/70">Обмен и возврат</a></li>
+            <li><a href="#" class="hover:text-white/70">Консьерж-сервис</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="mb-5 text-[11px] uppercase tracking-wide text-white/50">Продукция BORK</p>
+          <ul class="space-y-3 text-sm font-light">
+            <li><a href="#" class="hover:text-white/70">Новинки</a></li>
+            <li><a href="#" class="hover:text-white/70">Советы BORK</a></li>
+          </ul>
+          <p class="mb-5 mt-10 text-[11px] uppercase tracking-wide text-white/50">Приложение BORK</p>
+          <div class="flex gap-2">
+            <span class="rounded border border-white/20 px-3 py-1.5 text-xs">App Store</span>
+            <span class="rounded border border-white/20 px-3 py-1.5 text-xs">Google Play</span>
+          </div>
+        </div>
+        <div>
+          <p class="mb-5 text-[11px] uppercase tracking-wide text-white/50">Подписка</p>
+          <p class="mb-4 text-sm font-light text-white/70">Узнавайте о новинках и обновлениях первыми</p>
+          <form class="space-y-3" onsubmit="return false;">
+            <input type="email" placeholder="E-mail" class="w-full border-b border-white/20 bg-transparent py-3 text-sm outline-none placeholder:text-white/40 focus:border-white" />
+            <label class="flex items-start gap-2 text-xs text-white/50">
+              <input type="checkbox" class="mt-1" />
+              <span>Согласен с политикой конфиденциальности</span>
+            </label>
+            <button type="submit" class="w-full border border-white/30 py-3 text-xs uppercase tracking-wide transition hover:bg-white hover:text-bork-black">Подписаться</button>
+          </form>
+        </div>
       </div>
 
-      <!-- Pagination -->
-      <div class="hero-pagination swiper-pagination !bottom-[88px] !left-1/2 !w-auto !-translate-x-1/2"></div>
-    </div>
+      <div class="mt-16 flex flex-wrap items-center gap-6 border-t border-white/10 pt-10">
+        <a href="https://vk.com/bork_com" class="text-sm text-white/60 hover:text-white" target="_blank" rel="noopener">VK</a>
+        <a href="https://t.me/bork_public" class="text-sm text-white/60 hover:text-white" target="_blank" rel="noopener">Telegram</a>
+        <a href="https://youtube.com/bork" class="text-sm text-white/60 hover:text-white" target="_blank" rel="noopener">YouTube</a>
+        <a href="tel:88005008899" class="ml-auto text-sm tracking-wide">8 800 500 88 99</a>
+      </div>
 
-    <!-- Phone -->
-    <div class="pointer-events-none absolute inset-x-0 bottom-8 z-40 text-center">
-      <a
-        href="tel:88005008899"
-        class="pointer-events-auto text-[13px] font-light tracking-[0.18em] text-white/90 transition hover:text-white md:text-sm"
-      >
-        8 800 500 88 99
-      </a>
+      <div class="mt-10 space-y-4 border-t border-white/10 pt-10 text-xs text-white/40">
+        <p>BORK — международная компания, создающая бытовую технику и аксессуары премиум-класса.</p>
+        <div class="flex flex-wrap gap-4">
+          <span>© 2026 BORK. Все права защищены</span>
+          <a href="#" class="hover:text-white/70">Политика конфиденциальности</a>
+          <a href="#" class="hover:text-white/70">Публичная оферта</a>
+        </div>
+      </div>
     </div>
+  </footer>
 
-    <!-- Slider arrows -->
-    <button
-      type="button"
-      class="hero-prev icon-btn absolute left-3 top-1/2 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/10 backdrop-blur-sm md:left-8 md:flex"
-      aria-label="Предыдущий слайд"
-    >
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path d="M15 6l-6 6 6 6"></path>
-      </svg>
-    </button>
-    <button
-      type="button"
-      class="hero-next icon-btn absolute right-3 top-1/2 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/10 backdrop-blur-sm md:right-8 md:flex"
-      aria-label="Следующий слайд"
-    >
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path d="M9 6l6 6-6 6"></path>
-      </svg>
-    </button>
-  </main>
+  <!-- Cookie banner -->
+  <div id="cookieBar" class="cookie-bar fixed inset-x-0 bottom-0 z-[80] border-t border-bork-line bg-bork-header px-5 py-5 md:px-10">
+    <div class="mx-auto flex max-w-site flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+      <p class="max-w-3xl text-sm text-bork-muted">Для улучшения работы сайта мы используем файлы cookie. Продолжая использовать сайт, вы соглашаетесь с <a href="#" class="text-white underline">политикой конфиденциальности</a>.</p>
+      <button id="cookieAccept" type="button" class="shrink-0 border border-white/20 px-8 py-3 text-xs uppercase tracking-wide text-white transition hover:bg-white hover:text-bork-brown">Принять</button>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
-    const menuBtn = document.getElementById('menuBtn');
-    const menuClose = document.getElementById('menuClose');
-    const menuOverlay = document.getElementById('menuOverlay');
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
 
-    const openMenu = () => {
-      menuOverlay.classList.add('is-open');
-      menuOverlay.setAttribute('aria-hidden', 'false');
-      menuBtn.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
+    const siteHeader = $('#siteHeader');
+    const heroScrollWrap = $('#heroScrollWrap');
+    const heroScroller = $('#heroScroller');
+    const heroBottomBar = $('#heroBottomBar');
+    const pageMain = $('#pageMain');
+    const heroSlides = [...$$('.hero-slide')];
+
+    let sliderLocked = true;
+    let sliderComplete = false;
+    let wheelCooldown = false;
+
+    const getSlideHeight = () => heroSlides[0]?.offsetHeight || (window.innerHeight - 60);
+
+    const getCurrentSlideIndex = () => {
+      const h = getSlideHeight();
+      return Math.min(heroSlides.length - 1, Math.max(0, Math.round(heroScroller.scrollTop / h)));
     };
 
-    const closeMenu = () => {
-      menuOverlay.classList.remove('is-open');
-      menuOverlay.setAttribute('aria-hidden', 'true');
-      menuBtn.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
+    const scrollToSlide = (index, smooth = true) => {
+      const clamped = Math.max(0, Math.min(heroSlides.length - 1, index));
+      heroScroller.scrollTo({ top: clamped * getSlideHeight(), behavior: smooth ? 'smooth' : 'auto' });
     };
 
-    menuBtn.addEventListener('click', openMenu);
-    menuClose.addEventListener('click', closeMenu);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMenu();
+    const updateSlideStates = () => {
+      const idx = getCurrentSlideIndex();
+      heroSlides.forEach((slide, i) => {
+        slide.classList.toggle('is-visible', i === idx);
+      });
+      const isLast = idx >= heroSlides.length - 1;
+      heroBottomBar.classList.toggle('is-last', isLast && sliderComplete);
+      siteHeader.classList.add('has-header-bg');
+    };
+
+    const unlockPage = () => {
+      if (sliderComplete) return;
+      sliderComplete = true;
+      sliderLocked = false;
+      document.body.classList.remove('slider-locked');
+      heroScrollWrap.classList.add('is-complete');
+      pageMain.classList.add('is-active');
+      heroBottomBar.style.display = 'none';
+      window.scrollTo({ top: heroScrollWrap.offsetHeight - 1, behavior: 'smooth' });
+    };
+
+    const handleWheel = (e) => {
+      if (!sliderLocked || sliderComplete) return;
+      const idx = getCurrentSlideIndex();
+
+      if (e.deltaY > 0) {
+        e.preventDefault();
+        if (wheelCooldown) return;
+        wheelCooldown = true;
+        if (idx < heroSlides.length - 1) scrollToSlide(idx + 1);
+        else unlockPage();
+        setTimeout(() => { wheelCooldown = false; }, 700);
+      } else if (e.deltaY < 0 && idx > 0) {
+        e.preventDefault();
+        if (wheelCooldown) return;
+        wheelCooldown = true;
+        scrollToSlide(idx - 1);
+        setTimeout(() => { wheelCooldown = false; }, 700);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+
+    heroScroller.addEventListener('scroll', () => {
+      updateSlideStates();
+    }, { passive: true });
+
+    let touchStartY = 0;
+    heroScrollWrap.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    heroScrollWrap.addEventListener('touchmove', (e) => {
+      if (!sliderLocked || sliderComplete) return;
+      const deltaY = touchStartY - e.touches[0].clientY;
+      if (Math.abs(deltaY) < 8) return;
+      const fake = { deltaY: deltaY > 0 ? 120 : -120, preventDefault: () => e.preventDefault() };
+      handleWheel(fake);
+      touchStartY = e.touches[0].clientY;
+    }, { passive: false });
+
+    heroBottomBar.addEventListener('click', () => {
+      if (sliderComplete) return;
+      const idx = getCurrentSlideIndex();
+      if (idx < heroSlides.length - 1) scrollToSlide(idx + 1);
+      else unlockPage();
     });
 
-    const heroSwiper = new Swiper('.hero-swiper', {
-      loop: true,
-      speed: 1100,
-      effect: 'fade',
-      fadeEffect: { crossFade: true },
-      autoplay: {
-        delay: 5500,
-        disableOnInteraction: false,
-      },
-      pagination: {
-        el: '.hero-pagination',
-        clickable: true,
-      },
-      navigation: {
-        nextEl: '.hero-next',
-        prevEl: '.hero-prev',
-      },
+    heroSlides.forEach((slide, i) => {
+      slide.addEventListener('click', (e) => {
+        if (sliderComplete) return;
+        const idx = getCurrentSlideIndex();
+        if (i === idx && i < heroSlides.length - 1) {
+          e.preventDefault();
+          scrollToSlide(i + 1);
+        }
+      });
+    });
+
+    const slideObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+      });
+    }, { root: heroScroller, threshold: 0.55 });
+    heroSlides.forEach((slide) => slideObserver.observe(slide));
+
+    updateSlideStates();
+    heroSlides[0]?.classList.add('is-visible');
+    siteHeader.classList.add('has-header-bg');
+
+    const openPanel = (panel) => {
+      panel.classList.add('is-open');
+      panel.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+    const closePanel = (panel) => {
+      panel.classList.remove('is-open');
+      panel.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = sliderLocked && !sliderComplete ? 'hidden' : '';
+    };
+
+    const menuOverlay = $('#menuOverlay');
+    $('#menuBtn').addEventListener('click', () => openPanel(menuOverlay));
+    $('#menuClose').addEventListener('click', () => closePanel(menuOverlay));
+
+    const searchOverlay = $('#searchOverlay');
+    $('#searchBtn').addEventListener('click', () => { closePanel(menuOverlay); openPanel(searchOverlay); $('#searchInput').focus(); });
+    $('#searchClose').addEventListener('click', () => closePanel(searchOverlay));
+
+    const accountOverlay = $('#accountOverlay');
+    $('#accountBtn').addEventListener('click', () => openPanel(accountOverlay));
+    $('#menuAccountBtn').addEventListener('click', () => { closePanel(menuOverlay); openPanel(accountOverlay); });
+    $('#accountClose').addEventListener('click', () => closePanel(accountOverlay));
+
+    const cartDrawer = $('#cartDrawer');
+    const cartBackdrop = $('#cartBackdrop');
+    const openCart = () => { cartDrawer.classList.add('is-open'); cartBackdrop.classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
+    const closeCart = () => { cartDrawer.classList.remove('is-open'); cartBackdrop.classList.add('hidden'); document.body.style.overflow = ''; };
+    $('#cartBtn').addEventListener('click', openCart);
+    $('#cartClose').addEventListener('click', closeCart);
+    cartBackdrop.addEventListener('click', closeCart);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      [menuOverlay, searchOverlay, accountOverlay].forEach((p) => closePanel(p));
+      closeCart();
+    });
+
+    const initProductSwiper = (name) => {
+      new Swiper(`[data-collection="${name}"]`, {
+        slidesPerView: 'auto', spaceBetween: 16,
+        navigation: { nextEl: `.collection-next-${name}`, prevEl: `.collection-prev-${name}` },
+        breakpoints: { 768: { spaceBetween: 24 } },
+      });
+    };
+    ['fans', 'vacuum', 'massage', 'home'].forEach(initProductSwiper);
+
+    window.addEventListener('scroll', () => {
+      siteHeader.classList.toggle('has-header-bg', window.scrollY > 20 || sliderLocked);
+    }, { passive: true });
+
+    const cookieBar = $('#cookieBar');
+    if (!localStorage.getItem('bork-cookie-accepted')) {
+      requestAnimationFrame(() => cookieBar.classList.add('is-visible'));
+    }
+    $('#cookieAccept').addEventListener('click', () => {
+      localStorage.setItem('bork-cookie-accepted', '1');
+      cookieBar.classList.remove('is-visible');
+    });
+
+    const products = [
+      { name: 'Фен BORK F730 LE', price: '33 000 ₽' },
+      { name: 'Комплексная система лифтинга BORK F704', price: '48 000 ₽' },
+      { name: 'Портативный увлажнитель BORK F772', price: '27 000 ₽' },
+      { name: 'Умное зеркало BORK F771', price: '29 000 ₽' },
+      { name: 'Моющий пылесос BORK V810 Neuron', price: '108 000 ₽' },
+      { name: 'Робот-пылесос BORK V830', price: '98 000 ₽' },
+      { name: 'Очиститель-увлажнитель BORK A802 RAIN', price: '89 000 ₽' },
+      { name: 'Очиститель воздуха BORK A808', price: '117 000 ₽' },
+      { name: 'Массажёр для ног BORK D715', price: '59 000 ₽' },
+      { name: 'Перкуссионный массажёр BORK D701', price: '29 000 ₽' },
+      { name: 'Массажёр для шеи BORK D708', price: '39 000 ₽' },
+      { name: 'Массажёр для глаз BORK D622', price: '18 000 ₽' },
+      { name: 'Набор для сервировки BORK HK804', price: '45 000 ₽' },
+      { name: 'Power bank BORK L795', price: '9 000 ₽' },
+      { name: 'Вафельница BORK G702', price: '39 000 ₽' },
+      { name: 'Микроволновая печь BORK W800', price: '63 000 ₽' },
+    ];
+    const searchInput = $('#searchInput');
+    const searchResults = $('#searchResults');
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      if (!q) {
+        searchResults.innerHTML = '<p class="text-[11px] uppercase tracking-wide text-bork-gray">Популярные категории</p><div class="mt-4 flex flex-wrap gap-2"><a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Новинки</a><a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Кухня</a><a href="#" class="rounded-full border border-black/10 px-4 py-2 text-sm hover:bg-white">Дом</a></div>';
+        return;
+      }
+      const matches = products.filter((p) => p.name.toLowerCase().includes(q));
+      searchResults.innerHTML = matches.length
+        ? '<p class="text-[11px] uppercase tracking-wide text-bork-gray">Результаты</p><div class="mt-4 space-y-3">' + matches.map((p) => `<a href="#" class="block rounded-sm border border-black/10 bg-white px-4 py-3 hover:border-black/20"><span class="block text-sm">${p.name}</span><span class="text-sm text-bork-muted">${p.price}</span></a>`).join('') + '</div>'
+        : '<p class="text-sm text-bork-muted">Ничего не найдено</p>';
     });
   </script>
 </body>
